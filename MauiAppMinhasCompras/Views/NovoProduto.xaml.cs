@@ -14,11 +14,15 @@ public partial class NovoProduto : ContentPage
     {
 		try 
 		{
+
+			string categoriaSelecionada = categoria_picker.SelectedItem?.ToString() ?? "Outros";
+
 			Produto p = new Produto
 			{
 				Descricao = txt_descricao.Text,
 				Quantidade = Convert.ToDouble(txt_quantidade.Text),
-				Preco = Convert.ToDouble(txt_preco.Text)
+				Preco = Convert.ToDouble(txt_preco.Text),
+				Categoria = categoriaSelecionada
 			};
 
 			await App.Db.Insert(p);

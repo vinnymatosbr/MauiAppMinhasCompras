@@ -1,4 +1,4 @@
-using MauiAppMinhasCompras.Models;
+﻿using MauiAppMinhasCompras.Models;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
@@ -72,7 +72,7 @@ public partial class ListaProduto : ContentPage
     {
         double soma = lista.Sum(i => i.Total);
 
-        string msg = $"O total � {soma:C}";
+        string msg = $"O total é {soma:C}";
 
         DisplayAlert("Total dos Produtos", msg, "OK");
     }
@@ -85,7 +85,7 @@ public partial class ListaProduto : ContentPage
 
             Produto p = selecionado.BindingContext as Produto;
 
-            bool confirm = await DisplayAlert("Tem Certeza?", $"Remover {p.Descricao}?", "Sim", "N�o");
+            bool confirm = await DisplayAlert("Tem Certeza?", $"Remover {p.Descricao}?", "Sim", "Não");
 
             if(confirm)
             {
@@ -133,6 +133,57 @@ public partial class ListaProduto : ContentPage
         finally
         {
             lst_produtos.IsRefreshing = false;
+        }
+    }
+
+    private async void filtro_categoria_picker_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            string categoria = filtro_categoria_picker.SelectedItem.ToString();
+
+            lista.Clear();
+
+            if (categoria == "Todas")
+            {
+                List<Produto> tmp = await App.Db.GetALL();
+                for (int i = 0; i < tmp.Count; i++)
+                {
+                    lista.Add(tmp[i]);
+                }
+            }
+            else
+            {
+                List<Produto> tmp = await App.Db.GetByCategoria(categoria);
+                for (int i = 0; i < tmp.Count; i++)
+                {
+                    lista.Add(tmp[i]);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Ops", ex.Message, "OK");
+        }
+    }
+
+    private async void BtnRelatorio_Clicked(object sender, EventArgs e)
+    {
+        try
+        {
+            double soma = 0;
+            for (int i = 0; i < lista.Count; i++)
+            {
+                soma = soma + lista[i].Total;
+            }
+
+            string msg = "Total de gastos: " + soma.ToString("C");
+
+            await DisplayAlert("Relatório", msg, "OK");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Ops", ex.Message, "OK");
         }
     }
 }
